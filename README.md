@@ -1,249 +1,210 @@
 # Hybrid Deep Learning and Machine Learning Framework for Breast Cancer Detection Using Infrared Thermography
 
-A hybrid AI-based framework for breast cancer detection using infrared thermographic images by combining deep learning, handcrafted feature extraction, and ensemble machine learning techniques.
+A hybrid AI framework for breast cancer detection from infrared thermographic images, combining deep learning, handcrafted feature extraction, and ensemble machine learning.
 
-This project explores how hybrid architectures can improve medical image classification performance on small and low-contrast thermographic datasets, where traditional CNNs often struggle.
+This project explores how hybrid architectures can improve medical image classification on small, low-contrast thermographic datasets, where traditional CNNs alone often struggle.
 
 ---
 
-# Project Overview
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Models Implemented](#models-implemented)
+- [Performance Comparison](#performance-comparison)
+- [Dataset](#dataset)
+- [Preprocessing](#preprocessing)
+- [Data Augmentation](#data-augmentation)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Technologies Used](#technologies-used)
+- [Key Takeaways](#key-takeaways)
+
+---
+
+## Project Overview
 
 Breast cancer is one of the leading causes of death among women worldwide. Early detection significantly improves treatment success and survival rates.
 
 Traditional screening methods such as mammography:
 
-* are expensive,
-* expose patients to radiation,
-* and may not perform well for early-stage detection.
+- are expensive,
+- expose patients to radiation,
+- and may not perform well for early-stage detection.
 
-This project uses Infrared Thermography as a:
+This project uses **Infrared Thermography** as a:
 
-* non-invasive,
-* radiation-free,
-* cost-effective alternative.
+- non-invasive,
+- radiation-free,
+- cost-effective alternative.
 
 The proposed system combines:
 
-* Deep learning feature extraction
-* Handcrafted texture features (HOG)
-* Ensemble learning
-* Attention mechanisms
-* Knowledge distillation
-* Few-shot learning
+- Deep learning feature extraction
+- Handcrafted texture features (HOG)
+- Ensemble learning
+- Attention mechanisms (CBAM)
+- Knowledge distillation
+- Few-shot learning
 
-to improve detection accuracy and generalization.
-
----
-
-# Features
-
-* Hybrid Deep Learning + Machine Learning pipeline
-* CNN-based feature extraction
-* HOG (Histogram of Oriented Gradients) feature fusion
-* PCA-based dimensionality reduction
-* Attention mechanism using CBAM
-* Ensemble learning approaches
-* Few-shot learning implementation
-* Knowledge distillation framework
-* Snapshot ensemble training
-* Cross-validation evaluation
-* Performance comparison across models
+to improve detection accuracy and generalization on limited medical imaging data.
 
 ---
 
-# Models Implemented
+## Features
 
-## 1. Baseline CNN (ResNet50)
-
-Initial deep learning model trained directly on thermographic images.
-
-Result:
-
-* Accuracy: ~60%
-
----
-
-## 2. CNN + HOG Hybrid Model
-
-Combined:
-
-* Deep CNN features
-* HOG handcrafted texture features
-* PCA for dimensionality reduction
-
-Result:
-
-* Accuracy: ~92.45%
+- Hybrid Deep Learning + Machine Learning pipeline
+- CNN-based feature extraction
+- HOG (Histogram of Oriented Gradients) feature fusion
+- PCA-based dimensionality reduction
+- Attention mechanism using CBAM (Convolutional Block Attention Module)
+- Multiple ensemble learning strategies (stacking, snapshot)
+- Few-shot learning implementation (Prototypical Networks)
+- Knowledge distillation framework (teacher–student)
+- Shared 5-fold cross-validation evaluation across all experiments
+- Unified metric reporting: Accuracy, F1-score, Recall, Precision, Sensitivity, Specificity, AUROC
+- Side-by-side performance comparison across all models
 
 ---
 
-## 3. CBAM + LightGBM
+## Models Implemented
 
-Used:
+### 1. Baseline CNN (ResNet50)
 
-* CBAM (Convolutional Block Attention Module)
-* LightGBM classifier
+Initial deep learning model trained directly on raw thermographic images, with no handcrafted features or ensembling.
 
-Result:
+- **Accuracy:** ~66%
+- Suffered from severe overfitting on the small dataset.
 
-* Accuracy: ~92.45%
-* ROC-AUC: 0.975
+### 2. CNN + HOG Hybrid Model
 
----
+Combines deep CNN features with HOG handcrafted texture features, then reduces dimensionality with PCA before classification.
 
-## 4. SVM Classification
+- **Accuracy:** ~92.45%
 
-Tested multiple kernels:
+### 3. CBAM + LightGBM
 
-* Linear
-* RBF
-* Polynomial
-* Sigmoid
+Uses CBAM to focus the network on the most diagnostically relevant image regions, then feeds the resulting features into a LightGBM classifier.
 
-Best performing kernel:
+- **Accuracy:** ~94.34%
+- **ROC-AUC:** 0.974
 
-* Sigmoid
+### 4. SVM Classification
 
-Result:
+Tested across multiple kernels — Linear, RBF, Polynomial, and Sigmoid.
 
-* Accuracy: ~92.4%
+- **Best kernel:** RBF
+- **Accuracy:** ~81.13%
 
----
+### 5. Knowledge Distillation
 
-## 5. Knowledge Distillation
+A teacher–student setup where a large model transfers its learned representations to a lightweight student model.
 
-Teacher-Student architecture:
+- **Teacher:** EfficientNet + CBAM
+- **Student:** LightGBM
+- **Accuracy:** ~90.57%
+- **ROC-AUC:** 0.988
 
-* Teacher: EfficientNet + CBAM
-* Student: LightGBM
+### 6. Few-Shot Learning Ensemble
 
-Result:
+Designed for low-data regimes using Prototypical Networks on top of a pretrained ResNet feature extractor.
 
-* Accuracy: ~90.56%
-* ROC-AUC: 0.986
+- **Accuracy:** ~86.79%
+- **Cancer recall:** ~95% (high sensitivity to positive cases)
 
----
+### 7. Snapshot Ensemble
 
-## 6. Few-Shot Learning Ensemble
+Trains a single network but captures multiple "snapshots" during training (via cosine annealing) and ensembles them at inference time.
 
-Implemented:
+- **Accuracy:** ~90.57%
 
-* Prototypical Networks
-* Pretrained ResNet feature extractor
+### 8. Stacking Ensemble (Best Model)
 
-Result:
+Combines predictions from multiple base learners using a meta-model.
 
-* Accuracy: ~90.5%
-* High cancer recall (~95%)
+- **Base models:** LightGBM, Random Forest, SVM, Logistic Regression
+- **Meta-model:** combines base-learner outputs into a final prediction
 
----
-
-## 7. Snapshot Ensemble
-
-Used:
-
-* Cosine annealing
-* Multiple model snapshots during training
-
-Result:
-
-* Accuracy: ~88.6%
+**Best Result:**
+- **Accuracy:** 96.23%
+- **ROC-AUC:** 0.989
+- **F1-score:** 0.95
 
 ---
 
-## 8. Stacking Ensemble (Best Model)
 
-Base Models:
-
-* LightGBM
-* Random Forest
-* SVM
-* Logistic Regression
-
-Meta-model combines predictions from all base learners.
-
-Best Result:
-
-* Accuracy: 96.23%
-* ROC-AUC: 0.986
-* F1-score: 0.96
 
 ---
 
-# Dataset
+## Dataset
 
-## Dataset Used
-
-DMR-IR Thermal Breast Dataset
-
-Source:
-
-* Kaggle Public Dataset
-
-## Image Type
-
-* Infrared Thermal Images
-
-## Classes
-
-* Normal (Healthy)
-* Abnormal (Cancerous)
+- **Dataset used:** DMR-IR Thermal Breast Dataset (Breast Cancer Detection using Thermography)
+- **Source:** Kaggle Public Dataset
+- **Image type:** Infrared thermal images
+- **Classes:**
+  - Normal (Healthy)
+  - Abnormal / Sick (Cancerous)
 
 ---
 
-# Preprocessing
+## Preprocessing
 
-* Image resizing → 224 × 224
-* Normalization
-* Noise handling
-* Feature extraction
-* PCA dimensionality reduction
-
----
-
-# Data Augmentation
-
-Applied:
-
-* Rotation
-* Horizontal flipping
-* Zoom transformations
-* Brightness variation
-
-Observation:
-
-Standard augmentation slightly reduced performance because thermal integrity was affected.
-
-| Model                | Accuracy |
-| -------------------- | -------- |
-| Without Augmentation | 90.56%   |
-| With Augmentation    | 88.68%   |
+- Image resizing → 224 × 224
+- Normalization
+- Noise handling
+- Feature extraction (CNN + HOG)
+- PCA dimensionality reduction
 
 ---
 
-# Performance Comparison
+## Data Augmentation
 
-| Model                  | Accuracy | ROC-AUC | Key Insight                |
-| ---------------------- | -------- | ------- | -------------------------- |
-| Baseline CNN           | 60.0%    | 0.6875  | Severe overfitting         |
-| XGBoost                | 90.56%   | 0.9288  | Strong ML baseline         |
-| CNN + HOG              | 92.45%   | —       | Strong feature extraction  |
-| CBAM + LightGBM        | 92.45%   | 0.975   | Excellent cancer recall    |
-| Few-Shot Learning      | ~90.5%   | —       | Works well on limited data |
-| Snapshot Ensemble      | ~88.6%   | —       | Stable but lower diversity |
-| Knowledge Distillation | ~90.56%  | 0.986   | Better generalization      |
-| Stacking Ensemble      | 96.23%   | 0.986   | Best overall model         |
+Applied transformations:
+
+- Rotation
+- Horizontal flipping
+- Zoom transformations
+- Brightness variation
+
+**Observation:** Standard augmentation slightly *reduced* performance, since these transformations disrupted the thermal integrity of the images (thermal images encode temperature information spatially, so geometric/brightness distortions can introduce misleading signal).
+
 
 ---
 
-# Technologies Used
+## Evaluation Metrics
 
-* Python
-* TensorFlow / Keras
-* PyTorch
-* OpenCV
-* Scikit-learn
-* LightGBM
-* NumPy
-* Pandas
-* Matplotlib
+All experiments are scored with a shared, unified evaluation utility (5-fold reporting) covering:
+
+- Accuracy (%)
+- F1-score
+- Recall
+- Precision
+- Sensitivity
+- Specificity
+- AUROC
+
+This ensures every model — from the baseline CNN to the final stacking ensemble — is compared on a consistent, like-for-like basis.
+
+---
+
+## Technologies Used
+
+- Python
+- TensorFlow / Keras
+- PyTorch
+- OpenCV
+- Scikit-learn
+- LightGBM
+- NumPy
+- Pandas
+- Matplotlib
+
+---
+
+## Key Takeaways
+
+- Deep learning alone (baseline CNN) struggles on small, low-contrast thermographic datasets — hybrid approaches are essential.
+- Combining handcrafted features (HOG) with learned CNN features consistently boosts accuracy over either approach alone.
+- Attention mechanisms (CBAM) meaningfully improve both accuracy and ROC-AUC by focusing on diagnostically relevant regions.
+- Ensemble stacking of diverse base learners (LightGBM, Random Forest, SVM, Logistic Regression) yields the best overall performance.
+- Standard image augmentation can *hurt* performance on thermal data — domain-specific augmentation strategies are needed.
+- Few-shot learning is a promising direction given the limited availability of labeled medical thermography data.
